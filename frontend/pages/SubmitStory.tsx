@@ -86,7 +86,7 @@ export default function SubmitStory() {
           <h1 className="text-5xl md:text-6xl font-bold mb-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-1000">
             Bagikan Kisah Anda
           </h1>
-          <p className="text-xl text-purple-100 text-center max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-150">
+          <p className="text-xl text-purple-100 text-center max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000">
             Suara Anda penting. Berbagi kisah dapat membantu korban lain merasa tidak sendirian.
           </p>
         </div>
@@ -108,7 +108,7 @@ export default function SubmitStory() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200">
+        <form onSubmit={handleSubmit} className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
             <label htmlFor="title" className="block text-sm font-semibold text-gray-900 mb-3">
               Judul Kisah <span className="text-red-500">*</span>

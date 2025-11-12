@@ -1,8 +1,11 @@
-import { secret } from "encore.dev/config";
+import 'dotenv/config';
 
-const supabaseUrl = secret("SupabaseURL");
-const supabaseKey = secret("SupabaseKey");
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
 
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error("Supabase URL or Key not set in .env file");
+}
 export class SupabaseClient {
   private baseUrl: string;
   private apiKey: string;
@@ -100,4 +103,4 @@ export class SupabaseClient {
   }
 }
 
-export const getSupabase = () => new SupabaseClient(supabaseUrl(), supabaseKey());
+export const getSupabase = () => new SupabaseClient(supabaseUrl, supabaseKey);

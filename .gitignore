@@ -1,4 +1,5 @@
 .encore
+.env
 encore.gen.go
 encore.gen.cue
 /.encore

@@ -13,11 +13,11 @@ export default function Footer() {
               <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 shadow-xl">
                 <Shield className="h-7 w-7 text-white" />
               </div>
-              <span className="font-bold text-2xl">DeepfakeAware</span>
+              <span className="font-bold text-2xl">RuangAman</span>
             </div>
             <p className="text-blue-100 leading-relaxed mb-6 max-w-md">
-              Platform kesadaran dan dukungan untuk korban deepfake di Indonesia. 
-              Bersama kita melawan penyalahgunaan teknologi deepfake.
+              Platform dari UBAYA West angkatan 2025, untuk kesadaran dan dukungan bagi korban "deepfake" di Indonesia. 
+              Ingatlah bahwa anda tidak sendiri {"<3"}, segera mencari bantuan jika anda adalah korban Deepfake.
             </p>
             <div className="flex items-center space-x-2 text-purple-200">
               <Heart className="h-5 w-5" />
@@ -30,25 +30,25 @@ export default function Footer() {
             <div className="space-y-3">
               <Link
                 to="/"
-                className="block text-blue-200 hover:text-white transition-colors hover:translate-x-1 transform duration-200"
+                className="block text-blue-200 hover:text-white hover:translate-x-1 transform duration-200"
               >
                 Beranda
               </Link>
               <Link
                 to="/how-to-report"
-                className="block text-blue-200 hover:text-white transition-colors hover:translate-x-1 transform duration-200"
+                className="block text-blue-200 hover:text-white hover:translate-x-1 transform duration-200"
               >
                 Cara Melapor
               </Link>
               <Link
                 to="/stories"
-                className="block text-blue-200 hover:text-white transition-colors hover:translate-x-1 transform duration-200"
+                className="block text-blue-200 hover:text-white hover:translate-x-1 transform duration-200"
               >
                 Kisah Korban
               </Link>
               <Link
                 to="/submit-story"
-                className="block text-blue-200 hover:text-white transition-colors hover:translate-x-1 transform duration-200"
+                className="block text-blue-200 hover:text-white hover:translate-x-1 transform duration-200"
               >
                 Bagikan Kisah
               </Link>
@@ -56,7 +56,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-bold text-lg mb-6 text-white">Sumber Daya</h3>
+            <h3 className="font-bold text-lg mb-6 text-white ">Sumber Daya</h3>
             <div className="space-y-4">
               <a
                 href="https://patrolisiber.id"

@@ -9,9 +9,11 @@
 		"paths": {
 			"~encore/*": ["./encore.gen/*"]
 		},
+		"emitDeclarationOnly": true,
 
 		/* Workspace Settings */
 		"composite": true,
+		"esModuleInterop": true,
 
 		/* Strict Type-Checking Options */
 		"strict": true,

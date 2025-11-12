@@ -1,10 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+'use client'; // Added this line
+
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { AlertTriangle, Users, FileText, ArrowRight, Shield, Eye, MessageSquare } from "lucide-react";
 import backend from "~backend/client";
 import Footer from "../components/Footer";
 import { Button } from "@/components/ui/button";
+import FaultyTerminal from "@/components/FaultyTerminal";
+import TextType from "@/components/TextType"; // Added this import
 
 export default function Home() {
   const { data: stats } = useQuery({
@@ -12,8 +16,10 @@ export default function Home() {
     queryFn: () => backend.analytics.getStats(),
   });
 
+  const terminalGridMul = useMemo(() => [2, 1] as [number, number], []);
   const [isVisible, setIsVisible] = useState<{ [key: string]: boolean }>({});
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const heroSectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     backend.analytics.trackPageView({ page: "/" }).catch(console.error);
@@ -37,41 +43,99 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700 text-white py-24">
+      <section ref={heroSectionRef} 
+      className="relative overflow-hidden text-white py-24">
+        <div className="absolute inset-0 z-0">
+          <FaultyTerminal
+            eventTargetRef={heroSectionRef}
+            scale={1.5}
+            gridMul={terminalGridMul}
+            digitSize={1.2}
+            timeScale={1}
+            curvature={0.1}
+            scanlineIntensity={0}
+            glitchAmount={0.2}
+            flickerAmount={0.9}
+            noiseAmp={1}
+            tint="#a4a4a4ff" // You might want white text on a blue/purple gradient
+            gradientStartColor="#1e3a8a" // Customize your gradient start color (e.g., deep blue)
+            gradientEndColor="#8b5cf6"   // Customize your gradient end color (e.g., vibrant purple)
+            mouseReact={true}
+            mouseStrength={1}
+            pageLoadAnimation={false}
+            brightness={0.8}
+          />
+        </div>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center">
             <div className="inline-block mb-6 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium border border-white/20">
               Platform Kesadaran Deepfake Indonesia
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-              Bersama Melawan Deepfake
-            </h1>
-            <p className="text-xl md:text-2xl mb-10 text-blue-100 max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-150">
-              Platform kesadaran dan dukungan untuk korban deepfake di Indonesia
+            
+            {/* === MODIFIED TITLE === */}
+            <div className="grid justify-items-center">
+              <h1
+                className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100 invisible [grid-area:1/1]"
+                aria-hidden="true"
+              >
+                Bersama Melawan Deepfake
+              </h1>
+              
+              <TextType
+                as="h1"
+                text="Bersama Melawan Deepfake"
+                className="text-5xl  md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100 [grid-area:1/1]"
+                typingSpeed={60}
+                loop={false}
+                showCursor={true}
+                cursorCharacter="_"
+                cursorClassName="text-white text-5xl md:text-7xl"
+                initialDelay={200}
+              />
+            </div>
+            {/* === END MODIFIED TITLE === */}
+
+            <p className="text-xl md:text-2xl mb-10 text-blue-100 max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000 ">
+              Anda tidak sendirian{"<3"}. Kami di sini untuk membantu Anda mengatasi ancaman deepfake.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in fade-in slide-in-from-bottom-4 duration-1000 ">
               <Link to="/how-to-report">
                 <Button size="lg" className="w-full sm:w-auto bg-white text-blue-600 hover:bg-blue-50 shadow-xl hover:shadow-2xl transition-all hover:scale-105">
                   Cara Melapor
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
+              
+              {/* === MODIFIED BUTTON === */}
               <Link to="/submit-story">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white/10 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all hover:scale-105">
-                  Bagikan Kisah Anda
+                <Button size="lg" className="w-full sm:w-auto bg-white hover:bg-blue-50 border-white text-blue-600 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all hover:scale-105">
+                  <TextType
+                    as="span" // Use 'span' to be valid inside a button
+                    text="Bagikan Kisah Anda"
+                    typingSpeed={100}
+                    loop={true}
+                    pauseDuration={3000}
+                    showCursor={true}
+                    cursorCharacter="_"
+                    cursorClassName="text-blue-600"
+                  />
                 </Button>
               </Link>
+              {/* === END MODIFIED BUTTON === */}
+
             </div>
           </div>
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      {/* ... (rest of the file is unchanged) ... */}
+
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 bg-white">
         <div
           id="bento-grid"
           data-animate
-          className={`grid grid-cols-1 md:grid-cols-4 gap-4 transition-all duration-1000 ${
+          className={`grid grid-cols-1 md:grid-cols-4 gap-4 transition-all duration-700 ${
             isVisible["bento-grid"] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
@@ -131,7 +195,7 @@ export default function Home() {
         <div
           id="cta-section"
           data-animate
-          className={`mt-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-3xl p-12 text-center text-white shadow-2xl transition-all duration-1000 ${
+          className={` z-0 mt-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-3xl p-12 text-center text-white shadow-2xl transition-all duration-700 ${
             isVisible["cta-section"] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
@@ -146,7 +210,7 @@ export default function Home() {
               </Button>
             </Link>
             <Link to="/stories">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white/10 backdrop-blur-sm shadow-xl hover:scale-105 transition-all">
+              <Button size="lg" className="w-full sm:w-auto bg-white text-purple-600 hover:bg-gray-100 shadow-xl hover:scale-105 transition-all">
                 Baca Kisah Lainnya
               </Button>
             </Link>
