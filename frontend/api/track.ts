@@ -1,6 +1,6 @@
 // Lokasi: frontend/api/track.ts
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { supabase } from '../lib/supabaseServer'; // Impor client server kita
+import { supabase } from './_client'; // Impor client server kita
 
 export default async function handler(
   req: VercelRequest,
