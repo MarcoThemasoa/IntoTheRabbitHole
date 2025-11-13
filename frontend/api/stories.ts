@@ -1,6 +1,6 @@
 // Lokasi: frontend/api/stories.ts
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { supabase } from './_client'; // Impor client server kita
+import { supabase } from './_client.js'; // Impor client server kita
 
 export default async function handler(
   req: VercelRequest,
