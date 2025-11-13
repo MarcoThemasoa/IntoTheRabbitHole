@@ -7,8 +7,8 @@ import { id } from "date-fns/locale/id";
 // Impor CSS untuk react-datepicker
 import "react-datepicker/dist/react-datepicker.css";
 import { MessageSquare, Calendar, User, ChevronDown, ChevronUp } from "lucide-react";
-import backend from "~backend/client";
 import Footer from "../components/Footer";
+import type { ListStoriesResponse, Story } from "@/lib/types";
 
 // Registrasi lokal 'id' untuk kalender
 registerLocale("id", id);
@@ -80,9 +80,9 @@ function StoryFilters({
 
 
 export default function Stories() {
-  const { data } = useQuery({
+  const { data } = useQuery<ListStoriesResponse>({
     queryKey: ["stories"],
-    queryFn: () => backend.stories.list(),
+    queryFn: () => fetch('/api/stories').then((res) => res.json()),
   });
 
   const [isVisible, setIsVisible] = useState<{ [key: string]: boolean }>({});
@@ -202,7 +202,7 @@ export default function Stories() {
 
   // --- EFEK & HANDLER (Tidak berubah) ---
   useEffect(() => {
-    backend.analytics.trackPageView({ page: "/stories" }).catch(console.error);
+    fetch('/api/track', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ page: '/stories' }) }).catch(console.error);
 
     observerRef.current = new IntersectionObserver(
       (entries) => {

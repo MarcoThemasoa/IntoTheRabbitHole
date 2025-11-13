@@ -4,16 +4,17 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { AlertTriangle, Users, FileText, ArrowRight, Shield, Eye, MessageSquare } from "lucide-react";
-import backend from "~backend/client";
 import Footer from "../components/Footer";
 import { Button } from "@/components/ui/button";
 import FaultyTerminal from "@/components/FaultyTerminal";
 import TextType from "@/components/TextType"; // Added this import
+import type { AnalyticsStats } from "@/lib/types";
 
 export default function Home() {
-  const { data: stats } = useQuery({
-    queryKey: ["stats"],
-    queryFn: () => backend.analytics.getStats(),
+  const { data: stats } = useQuery<AnalyticsStats>({
+  queryKey: ["stats"],
+  // Cukup panggil API Anda secara relatif. Vercel tahu di mana menemukannya.
+  queryFn: () => fetch('/api/stats').then((res) => res.json()),
   });
 
   const terminalGridMul = useMemo(() => [2, 1] as [number, number], []);
@@ -22,7 +23,7 @@ export default function Home() {
   const heroSectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    backend.analytics.trackPageView({ page: "/" }).catch(console.error);
+    fetch('/api/track', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ page: '/' }) }).catch(console.error);
 
     observerRef.current = new IntersectionObserver(
       (entries) => {

@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import { ExternalLink, CheckCircle2 } from "lucide-react";
-import backend from "~backend/client";
 import Footer from "../components/Footer";
 import { Button } from "@/components/ui/button";
 
@@ -9,7 +8,7 @@ export default function HowToReport() {
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    backend.analytics.trackPageView({ page: "/how-to-report" }).catch(console.error);
+    fetch('/api/track', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ page: '/how-to-report' }) }).catch(console.error);
 
     observerRef.current = new IntersectionObserver(
       (entries) => {

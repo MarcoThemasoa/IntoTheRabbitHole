@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Send, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import backend from "~backend/client";
 import Footer from "../components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,12 +19,19 @@ export default function SubmitStory() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    backend.analytics.trackPageView({ page: "/submit-story" }).catch(console.error);
+    fetch('/api/track', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ page: '/submit-story' }) }).catch(console.error);
   }, []);
 
   const createStoryMutation = useMutation({
     mutationFn: (data: { title: string; content: string; is_anonymous: boolean; author_name?: string }) =>
-      backend.stories.create(data),
+    fetch('/api/stories', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    }).then((res) => {
+      if (!res.ok) throw new Error('Network response was not ok');
+      return res.json();
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["stories"] });
       queryClient.invalidateQueries({ queryKey: ["stats"] });
