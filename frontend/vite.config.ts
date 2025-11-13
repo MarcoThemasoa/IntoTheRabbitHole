@@ -10,7 +10,7 @@ export default defineConfig({
     },
   },
   plugins: [tailwindcss(), react()],
-  mode: "development",
+  // HAPUS "mode: development" 
   build: {
     minify: false,
   }
