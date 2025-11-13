@@ -58,7 +58,7 @@ export default function HowToReport() {
           <h1 className="text-5xl md:text-6xl font-bold mb-4 animate-in fade-in slide-in-from-bottom-4 duration-1000">
             Cara Melaporkan Deepfake
           </h1>
-          <p className="text-xl text-blue-100 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-150">
+          <p className="text-xl text-blue-100 animate-in fade-in slide-in-from-bottom-4 duration-1000 ">
             Panduan langkah demi langkah untuk melaporkan konten deepfake
           </p>
         </div>
