@@ -160,7 +160,7 @@ export default function Home() {
             <div className="bg-gradient-to-br from-purple-100 to-purple-200 w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <Users className="h-7 w-7 text-purple-600" />
             </div>
-            <h4 className="text-sm font-semibold text-gray-600 mb-2">Total Pengunjung</h4>
+            <h4 className="text-sm font-semibold text-gray-600 mb-2">Total Dikunjung</h4>
             <p className="text-3xl font-bold text-gray-900">{stats?.totalVisitors.toLocaleString() || "0"}</p>
           </div>
 
