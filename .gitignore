@@ -1,7 +1,10 @@
 .encore
+.env.local
 .env
 encore.gen.go
 encore.gen.cue
 /.encore
 node_modules
 /encore.gen
+frontend/.env.local
+.vercel

@@ -1,6 +1,6 @@
 // Lokasi: frontend/api/track.ts
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { supabase } from './_client.js'; // Impor client server kita
+import { supabase } from './_client.js'; // Pastikan .js ada di akhir
 
 export default async function handler(
   req: VercelRequest,
@@ -11,22 +11,31 @@ export default async function handler(
   }
 
   try {
-    const { page, referrer } = req.body;
-    
-    // Ambil IP dari header Vercel
+    const { page, referrer, visitorId } = req.body;
     const user_ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
-    const { error } = await supabase.from('page_views').insert({
-      page: page,
-      referrer: referrer,
-      visited_at: new Date().toISOString(),
-      // Kita juga bisa menyimpan IP jika Anda mau
-      // user_ip: user_ip 
-    });
-    // Anda juga bisa memanggil RPC Anda:
-    // const { error } = await supabase.rpc('track_page_view', { user_ip: String(user_ip) });
+    // --- INI PERBAIKANNYA: Logika "Insert or Ignore" yang lebih aman ---
+    if (visitorId) {
+      // 2. Cek apakah visitorId sudah ada di database
+      const { data: existingVisitor } = await supabase
+        .from('visitors')
+        .select('visitor_id')
+        .eq('visitor_id', visitorId)
+        .maybeSingle();
 
-    if (error) throw error;
+      // 3. Jika TIDAK ADA, baru masukkan
+      if (!existingVisitor) {
+        const { error: visitorError } = await supabase
+          .from('visitors')
+          .insert({ visitor_id: visitorId }); // <- INSERT SEDERHANA
+
+        if (visitorError) {
+           // Ini akan menangkap error jika terjadi konflik unik
+           throw visitorError;
+        }
+      }
+    }
+    // --- AKHIR PERBAIKAN ---
 
     res.status(200).json({ success: true });
   } catch (error: any) {

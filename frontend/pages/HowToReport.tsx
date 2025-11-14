@@ -2,14 +2,22 @@ import { useEffect, useState, useRef } from "react";
 import { ExternalLink, CheckCircle2 } from "lucide-react";
 import Footer from "../components/Footer";
 import { Button } from "@/components/ui/button";
+import { getVisitorId } from "@/lib/utils";
 
 export default function HowToReport() {
   const [isVisible, setIsVisible] = useState<{ [key: string]: boolean }>({});
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    fetch('/api/track', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ page: '/how-to-report' }) }).catch(console.error);
-
+    const visitorId = getVisitorId(); // Panggil helper function
+    fetch('/api/track', { 
+      method: 'POST', 
+      headers: {'Content-Type': 'application/json'}, 
+      body: JSON.stringify({ 
+        page: '/', // atau '/stories', dll.
+        visitorId: visitorId // <-- TAMBAHKAN INI
+      }) 
+    }).catch(console.error);
     observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

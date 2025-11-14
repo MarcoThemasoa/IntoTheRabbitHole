@@ -9,6 +9,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { MessageSquare, Calendar, User, ChevronDown, ChevronUp } from "lucide-react";
 import Footer from "../components/Footer";
 import type { ListStoriesResponse, Story } from "@/lib/types";
+import { getVisitorId } from "@/lib/utils";
 
 // Registrasi lokal 'id' untuk kalender
 registerLocale("id", id);
@@ -121,7 +122,7 @@ export default function Stories() {
   
   const observerRef = useRef<IntersectionObserver | null>(null);
 
-  const TRUNCATE_LIMIT = 50; // Anda bisa ubah ke 150 lagi
+  const TRUNCATE_LIMIT = 70; 
 
   const toggleExpansion = (id: string) => {
     setExpandedStories((prev) => ({
@@ -202,8 +203,15 @@ export default function Stories() {
 
   // --- EFEK & HANDLER (Tidak berubah) ---
   useEffect(() => {
-    fetch('/api/track', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ page: '/stories' }) }).catch(console.error);
-
+        const visitorId = getVisitorId(); // Panggil helper function
+    fetch('/api/track', { 
+      method: 'POST', 
+      headers: {'Content-Type': 'application/json'}, 
+      body: JSON.stringify({ 
+        page: '/', // atau '/stories', dll.
+        visitorId: visitorId // <-- TAMBAHKAN INI
+      }) 
+    }).catch(console.error);
     observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -263,7 +271,7 @@ export default function Stories() {
 
             {/* Bagian Kanan: Filter (PROPS DIPERBARUI) */}
             {data?.stories && data.stories.length > 0 && (
-              <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 ">
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 ">
                 <StoryFilters 
                   availableFilters={availableFilters}
                   startDate={startDate}
@@ -320,7 +328,7 @@ export default function Stories() {
                     key={storyId}
                     id={`story-card-${storyId}`}
                     data-animate
-                    className={`bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] flex flex-col ${
+                    className={`bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-400 hover:scale-[1.02] flex flex-col ${
                       isVisible[`story-card-${storyId}`] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
                     }`}
                     style={{ transitionDelay: `${(index % STORIES_PER_PAGE) * 100}ms` }} // index % 6

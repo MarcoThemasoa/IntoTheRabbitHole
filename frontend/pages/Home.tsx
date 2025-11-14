@@ -8,7 +8,8 @@ import Footer from "../components/Footer";
 import { Button } from "@/components/ui/button";
 import FaultyTerminal from "@/components/FaultyTerminal";
 import TextType from "@/components/TextType"; // Added this import
-import type { AnalyticsStats } from "@/lib/types";
+import type { AnalyticsStats } from "@/lib/types"; // Import the helper function
+import { getVisitorId } from "@/lib/utils"; // Import the helper function
 
 export default function Home() {
   const { data: stats } = useQuery<AnalyticsStats>({
@@ -23,8 +24,15 @@ export default function Home() {
   const heroSectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    fetch('/api/track', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ page: '/' }) }).catch(console.error);
-
+    const visitorId = getVisitorId(); // Panggil helper function
+    fetch('/api/track', { 
+      method: 'POST', 
+      headers: {'Content-Type': 'application/json'}, 
+      body: JSON.stringify({ 
+        page: '/', // atau '/stories', dll.
+        visitorId: visitorId // <-- TAMBAHKAN INI
+      }) 
+    }).catch(console.error);
     observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -87,7 +95,7 @@ export default function Home() {
                 as="h1"
                 text="Bersama Melawan Deepfake"
                 className="text-5xl  md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100 [grid-area:1/1]"
-                typingSpeed={60}
+                typingSpeed={50}
                 loop={false}
                 showCursor={true}
                 cursorCharacter="_"
