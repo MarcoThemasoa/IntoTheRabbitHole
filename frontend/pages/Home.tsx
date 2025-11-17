@@ -1,14 +1,14 @@
-'use client'; // Added this line
+'use client'; 
 
 import { useEffect, useRef, useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { AlertTriangle, Users, FileText, ArrowRight, Shield, Eye, MessageSquare } from "lucide-react";
 import Footer from "../components/Footer";
 import { Button } from "@/components/ui/button";
 import FaultyTerminal from "@/components/FaultyTerminal";
 import TextType from "@/components/TextType"; // Added this import
-import type { AnalyticsStats } from "@/lib/types"; // Import the helper function
+import type { AnalyticsStats, ListStoriesResponse } from "@/lib/types"; // Import the helper function
 import { getVisitorId } from "@/lib/utils"; // Import the helper function
 
 export default function Home() {
@@ -18,12 +18,18 @@ export default function Home() {
   queryFn: () => fetch('/api/stats').then((res) => res.json()),
   });
 
+  const queryClient = useQueryClient();
   const terminalGridMul = useMemo(() => [2, 1] as [number, number], []);
   const [isVisible, setIsVisible] = useState<{ [key: string]: boolean }>({});
   const observerRef = useRef<IntersectionObserver | null>(null);
   const heroSectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    queryClient.prefetchQuery<ListStoriesResponse>({
+      queryKey: ["stories"],
+      queryFn: () => fetch('/api/stories').then((res) => res.json()),
+      staleTime: 1000 * 60 * 5, // Data dianggap 'stale' setelah 5 menit
+    });
     const visitorId = getVisitorId(); // Panggil helper function
     fetch('/api/track', { 
       method: 'POST', 
