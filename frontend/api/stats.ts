@@ -33,7 +33,7 @@ export default async function handler(
       });
     }
 
-    // Get unique visitors for this month only
+    // Get total page visits for this month
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const monthStartISO = monthStart.toISOString();
@@ -41,13 +41,13 @@ export default async function handler(
     console.log('Stats Request - Current Date:', now.toISOString());
     console.log('Stats Request - Month Start:', monthStartISO);
     
-    // Query visitors table (not page_views)
-    const { count: visitorCount, error: visitorError } = await supabase
+    // Query visitors table - count all rows from this month (each row = one page visit)
+    const { count: pageVisits, error: visitorError } = await supabase
       .from('visitors')
       .select('*', { count: 'exact', head: true })
       .gte('created_at', monthStartISO);
 
-    console.log('Visitor Count (This Month):', visitorCount, 'Error:', visitorError);
+    console.log('Page Visits This Month:', pageVisits, 'Error:', visitorError);
 
     if (visitorError) {
       console.error('Error counting visitors:', visitorError);
@@ -62,9 +62,9 @@ export default async function handler(
       throw storyError;
     }
 
-    // Auto-cleanup: Delete old visitor records (older than 1 month)
+    // Auto-cleanup: Delete old records (older than 1 month)
     const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
-    if (visitorCount && visitorCount > 10) {
+    if (pageVisits && pageVisits > 10) {
       // Only cleanup if we have enough data
       await supabase.from('visitors').delete().lt('created_at', oneMonthAgo).then(() => {
         console.log('Cleanup completed');
@@ -76,7 +76,7 @@ export default async function handler(
     res.setHeader('Content-Type', 'application/json');
     
     const response = {
-      totalVisitors: visitorCount || 0,
+      totalVisitors: pageVisits || 0,
       totalStories: (stories as number) || 0,
       period: `This month (${monthStartISO.split('T')[0]})`
     };
