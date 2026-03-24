@@ -33,26 +33,42 @@ export default async function handler(
       });
     }
 
-    // Call Supabase RPC functions for aggregated data
-    const { data: visitors, error: visitorError } = await supabase.rpc('count_page_views');
+    // Get page views for this month only
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    
+    const { count: pageViewCount, error: viewError } = await supabase
+      .from('page_views')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', monthStart);
+
+    if (viewError) {
+      console.error('Error counting page views:', viewError);
+      throw viewError;
+    }
+
+    // Count total stories
     const { data: stories, error: storyError } = await supabase.rpc('count_stories');
 
-    if (visitorError) {
-      console.error('Error counting visitors:', visitorError);
-      throw visitorError;
-    }
     if (storyError) {
       console.error('Error counting stories:', storyError);
       throw storyError;
     }
+
+    // Auto-cleanup: Delete tracking records older than 1 month
+    const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    await supabase.from('page_views').delete().lt('created_at', oneMonthAgo).then(() => {
+      // Cleanup done, but don't fail the request if cleanup errors
+    }).catch((err) => console.error('Cleanup warning:', err));
 
     // Cache response for 5 minutes
     res.setHeader('Cache-Control', 'max-age=300, s-maxage=3600');
     res.setHeader('Content-Type', 'application/json');
     
     res.status(200).json({
-      totalVisitors: (visitors as number) || 0,
+      totalVisitors: pageViewCount || 0,
       totalStories: (stories as number) || 0,
+      period: `This month (${monthStart.split('T')[0]})`
     });
   } catch (error: any) {
     console.error('Stats error:', error);
