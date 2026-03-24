@@ -84,12 +84,14 @@ export default function Stories() {
   const { data, refetch } = useQuery<ListStoriesResponse>({
     queryKey: ["stories"],
     queryFn: () => fetch('/api/stories').then((res) => res.json()),
+    staleTime: 0, // Data always considered stale, so refetch triggers immediately
+    refetchInterval: 10000, // Auto-refetch every 10 seconds
   });
 
-  // Fetch fresh data whenever user navigates to Stories tab
+  // Fetch fresh data when component first mounts
   useEffect(() => {
     refetch();
-  }, [refetch]);
+  }, []);
 
   const [isVisible, setIsVisible] = useState<{ [key: string]: boolean }>({});
   const [expandedStories, setExpandedStories] = useState<{ [key: string]: boolean }>({});
