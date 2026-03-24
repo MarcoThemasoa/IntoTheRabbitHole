@@ -33,18 +33,25 @@ export default async function handler(
       });
     }
 
-    // Get page views for this month only
+    // Get unique visitors for this month only
     const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthStartISO = monthStart.toISOString();
     
-    const { count: pageViewCount, error: viewError } = await supabase
-      .from('page_views')
+    console.log('Stats Request - Current Date:', now.toISOString());
+    console.log('Stats Request - Month Start:', monthStartISO);
+    
+    // Query visitors table (not page_views)
+    const { count: visitorCount, error: visitorError } = await supabase
+      .from('visitors')
       .select('*', { count: 'exact', head: true })
-      .gte('created_at', monthStart);
+      .gte('created_at', monthStartISO);
 
-    if (viewError) {
-      console.error('Error counting page views:', viewError);
-      throw viewError;
+    console.log('Visitor Count (This Month):', visitorCount, 'Error:', visitorError);
+
+    if (visitorError) {
+      console.error('Error counting visitors:', visitorError);
+      throw visitorError;
     }
 
     // Count total stories
@@ -55,21 +62,28 @@ export default async function handler(
       throw storyError;
     }
 
-    // Auto-cleanup: Delete tracking records older than 1 month
+    // Auto-cleanup: Delete old visitor records (older than 1 month)
     const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
-    await supabase.from('page_views').delete().lt('created_at', oneMonthAgo).then(() => {
-      // Cleanup done, but don't fail the request if cleanup errors
-    }).catch((err) => console.error('Cleanup warning:', err));
+    if (visitorCount && visitorCount > 10) {
+      // Only cleanup if we have enough data
+      await supabase.from('visitors').delete().lt('created_at', oneMonthAgo).then(() => {
+        console.log('Cleanup completed');
+      }).catch((err) => console.error('Cleanup warning:', err));
+    }
 
     // Cache response for 5 minutes
     res.setHeader('Cache-Control', 'max-age=300, s-maxage=3600');
     res.setHeader('Content-Type', 'application/json');
     
-    res.status(200).json({
-      totalVisitors: pageViewCount || 0,
+    const response = {
+      totalVisitors: visitorCount || 0,
       totalStories: (stories as number) || 0,
-      period: `This month (${monthStart.split('T')[0]})`
-    });
+      period: `This month (${monthStartISO.split('T')[0]})`
+    };
+    
+    console.log('Stats Response:', response);
+    
+    res.status(200).json(response);
   } catch (error: any) {
     console.error('Stats error:', error);
     res.status(500).json({ error: 'Failed to fetch statistics' });
