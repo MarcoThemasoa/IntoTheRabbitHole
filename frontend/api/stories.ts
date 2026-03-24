@@ -2,7 +2,11 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { supabase } from './_client.js';
 import { StorySchema } from './schemas.js';
-import { storyRateLimiter, getClientId, checkRateLimit } from './ratelimit.js';
+import {
+  getClientId,
+  checkRateLimit,
+  rateLimitConfigs,
+} from './ratelimit.js';
 import { ZodError } from 'zod';
 
 export default async function handler(
@@ -15,8 +19,9 @@ export default async function handler(
       // Apply rate limiting
       const clientId = getClientId(req);
       const { success, remaining, resetIn } = await checkRateLimit(
-        generalRateLimiter,
-        `get_stories:${clientId}`
+        clientId,
+        rateLimitConfigs.general,
+        'get_stories'
       );
 
       if (!success) {
@@ -47,8 +52,9 @@ export default async function handler(
       // Apply rate limiting for submissions
       const clientId = getClientId(req);
       const { success, remaining, resetIn } = await checkRateLimit(
-        storyRateLimiter,
-        `submit_story:${clientId}`
+        clientId,
+        rateLimitConfigs.storySubmission,
+        'post_stories'
       );
 
       if (!success) {

@@ -2,7 +2,11 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { supabase } from './_client.js';
 import { TrackingSchema } from './schemas.js';
-import { trackingRateLimiter, getClientId, checkRateLimit } from './ratelimit.js';
+import {
+  getClientId,
+  checkRateLimit,
+  rateLimitConfigs,
+} from './ratelimit.js';
 import { ZodError } from 'zod';
 
 export default async function handler(
@@ -35,8 +39,9 @@ export default async function handler(
 
     // Apply rate limiting
     const { success, resetIn } = await checkRateLimit(
-      trackingRateLimiter,
-      `track_page:${clientId}`
+      clientId,
+      rateLimitConfigs.tracking,
+      'post_track'
     );
 
     if (!success) {

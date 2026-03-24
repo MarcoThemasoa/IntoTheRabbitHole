@@ -1,7 +1,11 @@
 // Lokasi: frontend/api/stats.ts
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { supabase } from './_client.js';
-import { generalRateLimiter, getClientId, checkRateLimit } from './ratelimit.js';
+import {
+  getClientId,
+  checkRateLimit,
+  rateLimitConfigs,
+} from './ratelimit.js';
 
 export default async function handler(
   req: VercelRequest,
@@ -16,8 +20,9 @@ export default async function handler(
     // Apply rate limiting
     const clientId = getClientId(req);
     const { success, resetIn } = await checkRateLimit(
-      generalRateLimiter,
-      `get_stats:${clientId}`
+      clientId,
+      rateLimitConfigs.general,
+      'get_stats'
     );
 
     if (!success) {

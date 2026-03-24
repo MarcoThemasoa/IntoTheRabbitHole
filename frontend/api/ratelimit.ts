@@ -1,78 +1,141 @@
 // frontend/api/ratelimit.ts
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
+import { supabase } from './_client.js';
 
 /**
- * Initialize rate limiter with Upstash Redis
- * Requires UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN env vars
+ * Rate limiting using Supabase PostgreSQL
+ * No external services needed, everything in one place
  */
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
-});
+export interface RateLimitConfig {
+  maxAttempts: number;
+  windowMs: number; // in milliseconds
+}
+
+// Rate limit configurations for different endpoints
+export const rateLimitConfigs = {
+  // Story submission limit: 5 submissions per hour per IP
+  storySubmission: {
+    maxAttempts: 5,
+    windowMs: 60 * 60 * 1000, // 1 hour
+  },
+  // Tracking limit: 50 page views per minute per visitor
+  tracking: {
+    maxAttempts: 50,
+    windowMs: 60 * 1000, // 1 minute
+  },
+  // General API limit: 100 requests per minute per IP
+  general: {
+    maxAttempts: 100,
+    windowMs: 60 * 1000, // 1 minute
+  },
+};
 
 /**
- * Create different rate limiters for different endpoints
+ * Get client identifier (IP address from request headers)
  */
-
-// Story submission limit: 5 submissions per hour per IP
-export const storyRateLimiter = new Ratelimit({
-  redis: redis,
-  limiter: Ratelimit.slidingWindow(5, '1 h'),
-  analytics: true,
-  prefix: 'ratelimit:story',
-});
-
-// Tracking limit: 50 page views per minute per visitor
-export const trackingRateLimiter = new Ratelimit({
-  redis: redis,
-  limiter: Ratelimit.slidingWindow(50, '1 m'),
-  analytics: true,
-  prefix: 'ratelimit:tracking',
-});
-
-// General API limit: 100 requests per minute per IP
-export const generalRateLimiter = new Ratelimit({
-  redis: redis,
-  limiter: Ratelimit.slidingWindow(100, '1 m'),
-  analytics: true,
-  prefix: 'ratelimit:general',
-});
-
-/**
- * Get client identifier (prefer user ID, fallback to IP)
- */
-export function getClientId(
-  req: any,
-  visitorId?: string
-): string {
+export function getClientId(req: any, visitorId?: string): string {
   if (visitorId) return visitorId;
-  
+
   const forwardedFor = req.headers['x-forwarded-for'];
   const clientIp = Array.isArray(forwardedFor)
     ? forwardedFor[0]
-    : forwardedFor?.split(',')[0]?.trim() || 
+    : forwardedFor?.split(',')[0]?.trim() ||
       req.headers['x-real-ip'] ||
       req.socket?.remoteAddress ||
       'unknown';
-  
+
   return clientIp;
 }
 
 /**
- * Utility to check rate limit and return response if exceeded
+ * Check rate limit for an identifier
+ * Returns { success: boolean, remaining: number, resetIn: number }
  */
 export async function checkRateLimit(
-  limiter: Ratelimit,
-  identifier: string
-): Promise<{ success: boolean; remaining?: number; resetIn?: number }> {
+  identifier: string,
+  config: RateLimitConfig,
+  endpoint: string
+): Promise<{
+  success: boolean;
+  remaining?: number;
+  resetIn?: number;
+}> {
   try {
-    const { success, remaining, resetIn } = await limiter.limit(identifier);
-    return { success, remaining, resetIn };
+    const now = new Date();
+    const windowStart = new Date(now.getTime() - config.windowMs);
+
+    // Count recent attempts from this identifier
+    const { count, error: countError } = await supabase
+      .from('rate_limits')
+      .select('*', { count: 'exact', head: true })
+      .eq('identifier', identifier)
+      .eq('endpoint', endpoint)
+      .gte('created_at', windowStart.toISOString());
+
+    if (countError) {
+      console.error('Rate limit check failed:', countError);
+      // Fail open - allow request if rate limiter fails
+      return { success: true };
+    }
+
+    const attempts = count || 0;
+
+    if (attempts >= config.maxAttempts) {
+      // Get the oldest attempt to calculate reset time
+      const { data: oldestAttempt } = await supabase
+        .from('rate_limits')
+        .select('created_at')
+        .eq('identifier', identifier)
+        .eq('endpoint', endpoint)
+        .gte('created_at', windowStart.toISOString())
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .single();
+
+      if (oldestAttempt) {
+        const resetTime = new Date(oldestAttempt.created_at).getTime() + config.windowMs;
+        const resetIn = Math.ceil((resetTime - now.getTime()) / 1000);
+        return { success: false, remaining: 0, resetIn };
+      }
+
+      return { success: false, remaining: 0, resetIn: Math.ceil(config.windowMs / 1000) };
+    }
+
+    // Record this attempt
+    await supabase.from('rate_limits').insert({
+      identifier,
+      endpoint,
+      created_at: now.toISOString(),
+    });
+
+    return {
+      success: true,
+      remaining: config.maxAttempts - attempts - 1,
+    };
   } catch (error) {
-    console.error('Rate limit check failed:', error);
+    console.error('Unexpected rate limit error:', error);
     // Fail open - allow request if rate limiter fails
     return { success: true };
+  }
+}
+
+/**
+ * Clean up old rate limit records (run periodically)
+ * Keeps database clean by removing records older than 24 hours
+ */
+export async function cleanupOldRateLimits(): Promise<void> {
+  try {
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+    const { error } = await supabase
+      .from('rate_limits')
+      .delete()
+      .lt('created_at', oneDayAgo);
+
+    if (error) {
+      console.error('Cleanup error:', error);
+    }
+  } catch (error) {
+    console.error('Unexpected cleanup error:', error);
   }
 }
