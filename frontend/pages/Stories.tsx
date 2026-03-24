@@ -81,10 +81,15 @@ function StoryFilters({
 
 
 export default function Stories() {
-  const { data } = useQuery<ListStoriesResponse>({
+  const { data, refetch } = useQuery<ListStoriesResponse>({
     queryKey: ["stories"],
     queryFn: () => fetch('/api/stories').then((res) => res.json()),
   });
+
+  // Fetch fresh data whenever user navigates to Stories tab
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   const [isVisible, setIsVisible] = useState<{ [key: string]: boolean }>({});
   const [expandedStories, setExpandedStories] = useState<{ [key: string]: boolean }>({});
