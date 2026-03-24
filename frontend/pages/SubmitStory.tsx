@@ -23,29 +23,69 @@ export default function SubmitStory() {
   }, []);
 
   const createStoryMutation = useMutation({
-    mutationFn: (data: { title: string; content: string; is_anonymous: boolean; author_name?: string }) =>
-    fetch('/api/stories', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    }).then((res) => {
-      if (!res.ok) throw new Error('Network response was not ok');
-      return res.json();
-    }),
+    mutationFn: async (data: { title: string; content: string; is_anonymous: boolean; author_name?: string }) => {
+      const res = await fetch('/api/stories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      const responseData = await res.json();
+
+      if (!res.ok) {
+        // Pass both status and response data for error handling
+        const error = new Error(responseData.error || 'Network response was not ok') as any;
+        error.status = res.status;
+        error.details = responseData.details;
+        throw error;
+      }
+
+      return responseData;
+    },
     onSuccess: () => {
+      // Reset form
+      setTitle("");
+      setContent("");
+      setIsAnonymous(true);
+      setAuthorName("");
+
+      // Invalidate queries to force refetch
       queryClient.invalidateQueries({ queryKey: ["stories"] });
       queryClient.invalidateQueries({ queryKey: ["stats"] });
+
       toast({
-        title: "Kisah berhasil dibagikan",
+        title: "Kisah berhasil dibagikan!",
         description: "Terima kasih telah berbagi kisah Anda. Semoga ini membantu orang lain.",
       });
-      navigate("/stories");
+
+      // Redirect setelah 1 detik
+      setTimeout(() => navigate("/stories"), 1000);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error("Error creating story:", error);
+
+      let description = "Terjadi kesalahan. Silakan coba lagi.";
+
+      // Handle validation errors (400)
+      if (error.status === 400) {
+        if (error.details && Array.isArray(error.details)) {
+          description = error.details.join("\n");
+        } else {
+          description = error.message || description;
+        }
+      }
+      // Handle rate limiting errors (429)
+      else if (error.status === 429) {
+        description = error.message || "Terlalu banyak pengiriman. Silakan coba lagi nanti.";
+      }
+      // Handle server errors (500)
+      else if (error.status === 500) {
+        description = "Server error. Silakan coba lagi nanti.";
+      }
+
       toast({
         title: "Gagal membagikan kisah",
-        description: "Terjadi kesalahan. Silakan coba lagi.",
+        description: description,
         variant: "destructive",
       });
     },
@@ -54,18 +94,66 @@ export default function SubmitStory() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!title.trim() || !content.trim()) {
+    // Validate title
+    if (!title.trim()) {
       toast({
-        title: "Form tidak lengkap",
-        description: "Judul dan isi kisah harus diisi.",
+        title: "Judul diperlukan",
+        description: "Silakan masukkan judul untuk kisah Anda.",
         variant: "destructive",
       });
       return;
     }
 
+    if (title.length < 5) {
+      toast({
+        title: "Judul terlalu pendek",
+        description: "Judul harus minimal 5 karakter.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (title.length > 500) {
+      toast({
+        title: "Judul terlalu panjang",
+        description: "Judul maksimal 500 karakter.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate content
+    if (!content.trim()) {
+      toast({
+        title: "Isi kisah diperlukan",
+        description: "Silakan masukkan isi kisah Anda.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (content.length < 10) {
+      toast({
+        title: "Isi kisah terlalu pendek",
+        description: "Isi kisah harus minimal 10 karakter.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (content.length > 10000) {
+      toast({
+        title: "Isi kisah terlalu panjang",
+        description: "Isi kisah maksimal 10,000 karakter.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate author name if not anonymous
     if (!isAnonymous && !authorName.trim()) {
       toast({
-        title: "Nama harus diisi",
+        title: "Nama diperlukan",
         description: "Jika tidak ingin anonim, mohon isi nama Anda.",
         variant: "destructive",
       });
@@ -73,10 +161,10 @@ export default function SubmitStory() {
     }
 
     createStoryMutation.mutate({
-      title,
-      content,
+      title: title.trim(),
+      content: content.trim(),
       is_anonymous: isAnonymous,
-      author_name: isAnonymous ? undefined : authorName,
+      author_name: isAnonymous ? undefined : authorName.trim(),
     });
   };
 
@@ -127,6 +215,18 @@ export default function SubmitStory() {
               className="text-lg border-2 focus:border-purple-500 transition-colors"
               required
             />
+            <div className="flex justify-between items-center mt-2">
+              <p className="text-xs text-gray-500">
+                Minimal 5 karakter, maksimal 500 karakter
+              </p>
+              <span className={`text-sm font-medium ${
+                title.length < 5 ? 'text-red-500' :
+                title.length > 500 ? 'text-red-500' :
+                'text-green-500'
+              }`}>
+                {title.length}/500
+              </span>
+            </div>
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
@@ -142,9 +242,18 @@ export default function SubmitStory() {
               className="text-base border-2 focus:border-purple-500 transition-colors resize-none"
               required
             />
-            <p className="text-sm text-gray-500 mt-3">
-              Mohon hindari membagikan informasi pribadi yang sensitif
-            </p>
+            <div className="flex justify-between items-center mt-3">
+              <p className="text-xs text-gray-500">
+                Minimal 10 karakter, maksimal 10,000 karakter. Hindari data pribadi yang sensitif.
+              </p>
+              <span className={`text-sm font-medium ${
+                content.length < 10 ? 'text-red-500' :
+                content.length > 10000 ? 'text-red-500' :
+                'text-green-500'
+              }`}>
+                {content.length}/10,000
+              </span>
+            </div>
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
@@ -187,8 +296,17 @@ export default function SubmitStory() {
 
           <Button
             type="submit"
-            className="w-full h-14 text-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02]"
-            disabled={createStoryMutation.isPending}
+            className="w-full h-14 text-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            disabled={
+              createStoryMutation.isPending ||
+              !title.trim() ||
+              title.length < 5 ||
+              title.length > 500 ||
+              !content.trim() ||
+              content.length < 10 ||
+              content.length > 10000 ||
+              (!isAnonymous && !authorName.trim())
+            }
           >
             {createStoryMutation.isPending ? (
               "Mengirim..."
