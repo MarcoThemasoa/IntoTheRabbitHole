@@ -9,9 +9,27 @@ export default defineConfig({
       '@': path.resolve(__dirname),
     },
   },
-  plugins: [tailwindcss(), react()],
-  // HAPUS "mode: development" 
+  plugins: [
+    react(),
+    tailwindcss(),
+  ],
   build: {
-    minify: false,
-  }
+    minify: 'terser',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui': ['@radix-ui/react-checkbox', '@radix-ui/react-slot', '@radix-ui/react-toast'],
+          'animations': ['animejs', 'gsap'],
+          'graphics': ['ogl'],
+          'data': ['@tanstack/react-query', '@supabase/supabase-js'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+  },
+  define: {
+    // Remove console.log in production builds
+    __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production'),
+  },
 })

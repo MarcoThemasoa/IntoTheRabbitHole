@@ -1,7 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Shield, Menu, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-import { animate } from 'animejs';
 import GlassSurface from "./GlassSurface";
 
 export default function Navigation() {
@@ -9,27 +8,23 @@ export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (navRef.current) {
-      animate( // <-- New v4 function
-        navRef.current, // <-- Target is the first argument
-        { // <-- Properties are the second argument
-          scale: scrolled ? 0.95 : 1,
-          duration: 400,
-          easing: "easeOutExpo",
-        }
-      );
-    }
-  }, [scrolled]);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      // Use passive event listener and debounce scroll events
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      
+      scrollTimeoutRef.current = setTimeout(() => {
+        setScrolled(window.scrollY > 20);
+      }, 16); // ~60fps
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    };
   }, []);
 
   // Scroll to the top of the page when the location changes
