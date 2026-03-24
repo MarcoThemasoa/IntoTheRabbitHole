@@ -42,24 +42,26 @@ export default function SubmitStory() {
 
       return responseData;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       // Reset form
       setTitle("");
       setContent("");
       setIsAnonymous(true);
       setAuthorName("");
 
-      // Invalidate queries to force refetch
-      queryClient.invalidateQueries({ queryKey: ["stories"] });
-      queryClient.invalidateQueries({ queryKey: ["stats"] });
-
       toast({
         title: "Kisah berhasil dibagikan!",
         description: "Terima kasih telah berbagi kisah Anda. Semoga ini membantu orang lain.",
       });
 
-      // Redirect setelah 1 detik
-      setTimeout(() => navigate("/stories"), 1000);
+      // Refetch queries immediately (wait for them to complete)
+      await Promise.all([
+        queryClient.refetchQueries({ queryKey: ["stories"] }),
+        queryClient.refetchQueries({ queryKey: ["stats"] }),
+      ]);
+
+      // Then navigate to Stories page
+      navigate("/stories");
     },
     onError: (error: any) => {
       console.error("Error creating story:", error);
