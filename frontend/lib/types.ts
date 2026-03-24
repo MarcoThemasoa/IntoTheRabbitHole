@@ -21,5 +21,4 @@ export interface ListStoriesResponse {
 export interface AnalyticsStats {
   totalVisitors: number;
   totalStories: number;
-  period?: string;
 }

@@ -120,8 +120,8 @@ export async function checkRateLimit(
 }
 
 /**
- * Clean up old rate limit records (keeps only recent 24 hours)
- * Called automatically with each stats request
+ * Clean up old rate limit records (run periodically)
+ * Keeps database clean by removing records older than 24 hours
  */
 export async function cleanupOldRateLimits(): Promise<void> {
   try {
@@ -133,30 +133,9 @@ export async function cleanupOldRateLimits(): Promise<void> {
       .lt('created_at', oneDayAgo);
 
     if (error) {
-      console.error('Rate limit cleanup error:', error);
+      console.error('Cleanup error:', error);
     }
   } catch (error) {
     console.error('Unexpected cleanup error:', error);
-  }
-}
-
-/**
- * Clean up old page view records (run via stats endpoint)
- * Keeps only the last month of page view data
- */
-export async function cleanupOldPageViews(): Promise<void> {
-  try {
-    const oneMonthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-
-    const { error } = await supabase
-      .from('page_views')
-      .delete()
-      .lt('created_at', oneMonthAgo);
-
-    if (error) {
-      console.error('Page view cleanup error:', error);
-    }
-  } catch (error) {
-    console.error('Unexpected page view cleanup error:', error);
   }
 }

@@ -181,9 +181,8 @@ export default function Home() {
             <div className="bg-gradient-to-br from-purple-100 to-purple-200 w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <Users className="h-7 w-7 text-purple-600" />
             </div>
-            <h4 className="text-sm font-semibold text-gray-600 mb-2">Pengunjung Bulan Ini</h4>
+            <h4 className="text-sm font-semibold text-gray-600 mb-2">Total Dikunjungi</h4>
             <p className="text-3xl font-bold text-gray-900">{stats?.totalVisitors.toLocaleString() || "0"}</p>
-            {stats?.period && <p className="text-xs text-gray-500 mt-2">{stats.period}</p>}
           </div>
 
           <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl transition-all hover:scale-[1.02] group">
