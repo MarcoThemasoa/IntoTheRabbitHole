@@ -214,7 +214,7 @@ export default function Home() {
           </div>
 
           {/* 5. Tip: Recognize Signs - Soft Tint */}
-          <div className="bg-gradient-to-br from-indigo-50/50 to-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-indigo-50 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-indigo-100 transition-all duration-500 group relative overflow-hidden">
+          <div className="md:col-span-2 bg-gradient-to-br from-indigo-50/50 to-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-indigo-50 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-indigo-100 transition-all duration-500 group relative overflow-hidden">
             <div className="absolute right-0 top-0 w-32 h-32 bg-indigo-100/30 rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-700" />
             <Eye className="h-8 w-8 mb-6 text-indigo-600 group-hover:scale-110 transition-transform duration-500" />
             <h3 className="text-xl font-semibold mb-3 text-slate-900 tracking-tight">Kenali Tanda</h3>
@@ -224,7 +224,7 @@ export default function Home() {
           </div>
 
           {/* 6. Tip: Report Immediately - Soft Tint */}
-          <div className="bg-gradient-to-br from-blue-50/50 to-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-blue-50 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-blue-100 transition-all duration-500 group relative overflow-hidden">
+          <div className="md:col-span-2 bg-gradient-to-br from-blue-50/50 to-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-blue-50 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-blue-100 transition-all duration-500 group relative overflow-hidden">
             <div className="absolute right-0 top-0 w-32 h-32 bg-blue-100/30 rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-700" />
             <MessageSquare className="h-8 w-8 mb-6 text-blue-600 group-hover:scale-110 transition-transform duration-500" />
             <h3 className="text-xl font-semibold mb-3 text-slate-900 tracking-tight">Laporkan Segera</h3>
