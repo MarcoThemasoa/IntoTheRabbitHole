@@ -70,7 +70,7 @@ export default function Home() {
   }, [queryClient]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-b from-white to-blue-50/50">
       <section ref={heroSectionRef} 
       className="relative overflow-hidden text-white py-24">
         <div className="absolute inset-0 z-0">
@@ -103,7 +103,6 @@ export default function Home() {
               Platform Kesadaran Deepfake Indonesia
             </div>
             
-            {/* === MODIFIED TITLE === */}
             <div className="grid justify-items-center">
               <h1
                 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100 invisible [grid-area:1/1]"
@@ -124,7 +123,6 @@ export default function Home() {
                 initialDelay={200}
               />
             </div>
-            {/* === END MODIFIED TITLE === */}
 
             <p className="text-xl md:text-2xl mb-10 text-blue-100 max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000 ">
               Anda tidak sendirian{"<3"}. Kami di sini untuk membantu Anda mengatasi ancaman deepfake.
@@ -137,11 +135,10 @@ export default function Home() {
                 </Button>
               </Link>
               
-              {/* === MODIFIED BUTTON === */}
               <Link to="/submit-story">
                 <Button size="lg" className="w-full sm:w-auto bg-white hover:bg-blue-50 border-white text-blue-600 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all hover:scale-105">
                   <TextType
-                    as="span" // Use 'span' to be valid inside a button
+                    as="span"
                     text="Bagikan Kisah Anda"
                     typingSpeed={100}
                     loop={true}
@@ -152,95 +149,111 @@ export default function Home() {
                   />
                 </Button>
               </Link>
-              {/* === END MODIFIED BUTTON === */}
-
             </div>
           </div>
         </div>
       </section>
 
-      {/* ... (rest of the file is unchanged) ... */}
-
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 bg-white">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        {/* === ELEGANT BENTO GRID === */}
         <div
           id="bento-grid"
           data-animate
-          className={`grid grid-cols-1 md:grid-cols-4 gap-4 transition-all duration-700 ${
-            isVisible["bento-grid"] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          className={`grid grid-cols-1 md:grid-cols-4 gap-6 transition-all duration-1000 ease-out ${
+            isVisible["bento-grid"] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
           }`}
         >
-          <div className="md:col-span-2 md:row-span-2 bg-gradient-to-br from-blue-500 to-blue-700 rounded-3xl p-8 text-white shadow-2xl hover:shadow-blue-500/20 transition-all hover:scale-[1.02] group">
-            <Shield className="h-12 w-12 mb-4 group-hover:scale-110 transition-transform" />
-            <h3 className="text-3xl font-bold mb-4">Apa itu Deepfake?</h3>
-            <p className="text-blue-100 text-lg leading-relaxed">
-              Deepfake adalah teknologi AI yang dapat memanipulasi video, audio, atau gambar untuk membuat konten palsu yang tampak nyata. Teknologi ini sering disalahgunakan untuk penipuan dan pencemaran nama baik.
+          {/* 1. Main Educational Anchor - Deep & Refined */}
+          <div className="md:col-span-2 md:row-span-2 relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 rounded-[2rem] p-8 md:p-10 text-white shadow-2xl hover:shadow-blue-900/20 transition-all duration-500 group border border-white/10 isolate">
+            <div className="absolute -right-20 -top-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-400/20 transition-colors duration-700" />
+            <Shield className="h-12 w-12 mb-6 text-blue-300 group-hover:scale-110 transition-transform duration-500" />
+            <h3 className="text-3xl md:text-4xl font-light tracking-tight mb-4 text-white">
+              Apa itu <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-indigo-300">Deepfake?</span>
+            </h3>
+            <p className="text-blue-100/70 text-lg leading-relaxed font-light">
+              Deepfake adalah teknologi AI yang dapat memanipulasi video, audio, atau gambar untuk membuat konten palsu yang tampak sangat nyata. Teknologi ini sering disalahgunakan untuk penipuan, manipulasi opini, dan pencemaran nama baik.
             </p>
           </div>
 
-          <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl transition-all hover:scale-[1.02] group">
-            <div className="bg-gradient-to-br from-purple-100 to-purple-200 w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-              <Users className="h-7 w-7 text-purple-600" />
+          {/* 2. Stat Card: Total Visitors - Clean Glassmorphism */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-blue-100 transition-all duration-500 group flex flex-col justify-center">
+            <div className="bg-blue-50/80 w-14 h-14 rounded-2xl flex items-center justify-center mb-6 group-hover:-translate-y-1 transition-transform duration-500">
+              <Users className="h-6 w-6 text-blue-600" />
             </div>
-            <h4 className="text-sm font-semibold text-gray-600 mb-2">Total Dikunjungi</h4>
-            <p className="text-3xl font-bold text-gray-900">{stats?.totalVisitors.toLocaleString() || "0"}</p>
+            <h4 className="text-sm font-medium text-slate-500 mb-2">Total Dikunjungi</h4>
+            <p className="text-4xl md:text-5xl font-semibold text-slate-900 tracking-tighter">
+              {stats?.totalVisitors.toLocaleString() || "0"}
+            </p>
           </div>
 
-          <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl transition-all hover:scale-[1.02] group">
-            <div className="bg-gradient-to-br from-blue-100 to-blue-200 w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-              <FileText className="h-7 w-7 text-blue-600" />
+          {/* 3. Stat Card: Stories Shared - Clean Glassmorphism */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-purple-100 transition-all duration-500 group flex flex-col justify-center">
+            <div className="bg-purple-50/80 w-14 h-14 rounded-2xl flex items-center justify-center mb-6 group-hover:-translate-y-1 transition-transform duration-500">
+              <FileText className="h-6 w-6 text-purple-600" />
             </div>
-            <h4 className="text-sm font-semibold text-gray-600 mb-2">Kisah Dibagikan</h4>
-            <p className="text-3xl font-bold text-gray-900">{stats?.totalStories.toLocaleString() || "0"}</p>
+            <h4 className="text-sm font-medium text-slate-500 mb-2">Kisah Dibagikan</h4>
+            <p className="text-4xl md:text-5xl font-semibold text-slate-900 tracking-tighter">
+              {stats?.totalStories.toLocaleString() || "0"}
+            </p>
           </div>
 
-          <div className="md:col-span-2 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-3xl p-8 shadow-2xl hover:shadow-orange-500/20 transition-all hover:scale-[1.02] group">
-            <div className="flex items-start space-x-4">
-              <AlertTriangle className="h-8 w-8 text-white flex-shrink-0 group-hover:scale-110 transition-transform" />
-              <div className="text-white">
-                <h3 className="font-bold text-xl mb-2">Peringatan Penting</h3>
-                <p className="text-white/90 leading-relaxed">
-                  Kasus deepfake meningkat drastis di Indonesia. Jika Anda menjadi korban, segera laporkan dan ingat: Anda tidak sendirian.
+          {/* 4. Warning Card - Sophisticated Accent */}
+          <div className="md:col-span-2 relative overflow-hidden bg-white/90 backdrop-blur-xl rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-500 group flex items-center">
+            <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-orange-400 to-red-500" />
+            <div className="flex items-start space-x-6 pl-2">
+              <div className="bg-orange-50 p-4 rounded-2xl group-hover:scale-105 transition-transform duration-500 flex-shrink-0">
+                <AlertTriangle className="h-7 w-7 text-orange-500" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-xl mb-2 text-slate-900 tracking-tight">Peringatan Penting</h3>
+                <p className="text-slate-600 leading-relaxed font-light">
+                  Kasus deepfake meningkat drastis di Indonesia. Jika Anda menjadi korban, segera laporkan dan ingat: <span className="font-medium text-slate-800">Anda tidak sendirian.</span>
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-purple-500 to-purple-700 rounded-3xl p-8 text-white shadow-2xl hover:shadow-purple-500/20 transition-all hover:scale-[1.02] group">
-            <Eye className="h-10 w-10 mb-4 group-hover:scale-110 transition-transform" />
-            <h3 className="text-xl font-bold mb-3">Kenali Tanda</h3>
-            <p className="text-purple-100 text-sm leading-relaxed">
-              Perhatikan ketidaksesuaian wajah, gerakan bibir tidak sinkron, atau kualitas video tidak konsisten.
+          {/* 5. Tip: Recognize Signs - Soft Tint */}
+          <div className="bg-gradient-to-br from-indigo-50/50 to-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-indigo-50 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-indigo-100 transition-all duration-500 group relative overflow-hidden">
+            <div className="absolute right-0 top-0 w-32 h-32 bg-indigo-100/30 rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-700" />
+            <Eye className="h-8 w-8 mb-6 text-indigo-600 group-hover:scale-110 transition-transform duration-500" />
+            <h3 className="text-xl font-semibold mb-3 text-slate-900 tracking-tight">Kenali Tanda</h3>
+            <p className="text-slate-600 text-sm leading-relaxed font-light">
+              Perhatikan ketidaksesuaian wajah, gerakan bibir tidak sinkron, atau kualitas video yang tidak konsisten.
             </p>
           </div>
 
-          <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-2xl hover:shadow-indigo-500/20 transition-all hover:scale-[1.02] group">
-            <MessageSquare className="h-10 w-10 mb-4 group-hover:scale-110 transition-transform" />
-            <h3 className="text-xl font-bold mb-3">Laporkan Segera</h3>
-            <p className="text-blue-100 text-sm leading-relaxed">
-              Jangan tunda melaporkan ke Patroli Siber dan Aduan Konten untuk tindakan cepat.
+          {/* 6. Tip: Report Immediately - Soft Tint */}
+          <div className="bg-gradient-to-br from-blue-50/50 to-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-blue-50 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-blue-100 transition-all duration-500 group relative overflow-hidden">
+            <div className="absolute right-0 top-0 w-32 h-32 bg-blue-100/30 rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-700" />
+            <MessageSquare className="h-8 w-8 mb-6 text-blue-600 group-hover:scale-110 transition-transform duration-500" />
+            <h3 className="text-xl font-semibold mb-3 text-slate-900 tracking-tight">Laporkan Segera</h3>
+            <p className="text-slate-600 text-sm leading-relaxed font-light">
+              Jangan tunda melaporkan ke Patroli Siber dan Aduan Konten untuk pencegahan tindakan yang lebih jauh.
             </p>
           </div>
         </div>
+        {/* === END ELEGANT BENTO GRID === */}
 
         <div
           id="cta-section"
           data-animate
-          className={` z-0 mt-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-3xl p-12 text-center text-white shadow-2xl transition-all duration-700 ${
-            isVisible["cta-section"] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          className={` z-0 mt-16 bg-gradient-to-r from-blue-900 to-indigo-900 rounded-[2.5rem] p-12 md:p-16 text-center text-white shadow-2xl transition-all duration-1000 ${
+            isVisible["cta-section"] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
           }`}
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Butuh Bantuan?</h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Kami siap membantu Anda melaporkan kasus deepfake dan memberikan dukungan yang Anda butuhkan.
+          <h2 className="text-3xl md:text-5xl font-light tracking-tight mb-6">Butuh Bantuan?</h2>
+          <p className="text-lg md:text-xl text-blue-100/80 mb-10 max-w-2xl mx-auto font-light">
+            Kami siap membantu Anda melaporkan kasus deepfake dan memberikan dukungan yang Anda butuhkan secara terarah.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/how-to-report">
-              <Button size="lg" className="w-full sm:w-auto bg-white text-purple-600 hover:bg-gray-100 shadow-xl hover:scale-105 transition-all">
+              <Button size="lg" className="w-full sm:w-auto bg-white text-indigo-900 hover:bg-indigo-50 shadow-xl hover:-translate-y-1 transition-all duration-300 rounded-full px-8">
                 Panduan Lengkap
               </Button>
             </Link>
             <Link to="/stories">
-              <Button size="lg" className="w-full sm:w-auto bg-white text-purple-600 hover:bg-gray-100 shadow-xl hover:scale-105 transition-all">
+              <Button size="lg" className="w-full sm:w-auto bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20 shadow-xl hover:-translate-y-1 transition-all duration-300 rounded-full px-8">
                 Baca Kisah Lainnya
               </Button>
             </Link>
