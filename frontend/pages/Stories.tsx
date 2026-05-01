@@ -91,7 +91,7 @@ export default function Stories() {
   // Fetch fresh data when component first mounts
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
 
   const [isVisible, setIsVisible] = useState<{ [key: string]: boolean }>({});
   const [expandedStories, setExpandedStories] = useState<{ [key: string]: boolean }>({});

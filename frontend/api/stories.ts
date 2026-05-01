@@ -43,7 +43,8 @@ export default async function handler(
         return res.status(500).json({ error: 'Failed to fetch stories' });
       }
 
-      res.setHeader('Cache-Control', 'max-age=300, s-maxage=3600');
+      // Don't cache user-generated content - always return fresh data
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       return res.status(200).json({ stories: data });
     }
     
