@@ -22,8 +22,11 @@ const queryClient = new QueryClient({
 
 // Loading component
 const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-white">
-    <div className="animate-pulse">Loading...</div>
+  <div className="min-h-screen flex items-center justify-center bg-sky-50">
+    <div className="flex flex-col items-center gap-4">
+      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 animate-pulse shadow-lg" />
+      <div className="animate-pulse text-sky-500 text-sm font-medium">Memuat...</div>
+    </div>
   </div>
 );
 
@@ -32,7 +35,7 @@ export default function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <div className="min-h-screen bg-white">
+          <div className="min-h-screen bg-sky-50">
             <Navigation />
             <Suspense fallback={<PageLoader />}>
               <Routes>

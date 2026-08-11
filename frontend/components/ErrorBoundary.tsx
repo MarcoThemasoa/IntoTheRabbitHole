@@ -51,7 +51,7 @@ export default class ErrorBoundary extends React.Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-pink-50 px-4">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-50 to-blue-100 px-4">
           <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 text-center">
             <div className="flex justify-center mb-4">
               <div className="bg-red-100 p-4 rounded-full">
@@ -79,7 +79,7 @@ export default class ErrorBoundary extends React.Component<Props, State> {
             <div className="space-y-3">
               <button
                 onClick={this.handleReset}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-2 px-4 rounded-lg hover:shadow-lg transition-all"
+                className="w-full bg-gradient-to-r from-sky-500 to-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:shadow-lg transition-all"
               >
                 Try Again
               </button>

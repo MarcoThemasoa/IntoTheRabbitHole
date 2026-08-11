@@ -20,8 +20,6 @@ export default defineConfig({
         manualChunks: {
           'vendor': ['react', 'react-dom', 'react-router-dom'],
           'ui': ['@radix-ui/react-checkbox', '@radix-ui/react-slot', '@radix-ui/react-toast'],
-          'animations': ['animejs', 'gsap'],
-          'graphics': ['ogl'],
           'data': ['@tanstack/react-query', '@supabase/supabase-js'],
         },
       },

@@ -8,7 +8,7 @@ export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout>();
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -44,6 +44,7 @@ export default function Navigation() {
   return (
     <nav
       ref={navRef}
+      aria-label="Navigasi utama"
       className={`sticky z-50 transition-all duration-300 ${
         (scrolled || mobileMenuOpen)
           ? 'top-3 my-2 mx-auto w-[min(100%_-_1rem,1100px)] rounded-3xl bg-white/80 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.35),transparent_40%),radial-gradient(circle_at_80%_30%,rgba(255,255,255,0.25),transparent_45%),linear-gradient(135deg,rgba(255,255,255,0.15),rgba(255,255,255,0.05))] backdrop-blur-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-white/40 supports-[backdrop-filter]:bg-white/70'
@@ -53,15 +54,15 @@ export default function Navigation() {
       <div className={`${scrolled ? 'px-3 sm:px-2' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'}`}>
         <div className={`flex justify-between ${scrolled ? 'h-14 sm:h-16' : 'h-16'}`}>
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-3 group">
+            <Link to="/" className="flex items-center space-x-3 group" aria-label="RuangAman — Beranda">
               <div
-                className={`p-2 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 shadow-lg group-hover:shadow-xl transition-all group-hover:scale-110 ${
-                  scrolled ? "shadow-blue-500/20" : ""
+                className={`p-2 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 shadow-lg group-hover:shadow-xl transition-all group-hover:scale-110 ${
+                  scrolled ? "shadow-sky-500/20" : ""
                 }`}
               >
                 <Shield className="h-5 w-5 text-white" />
               </div>
-              <span className="font-bold text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="font-bold text-xl bg-gradient-to-r from-sky-500 to-blue-700 bg-clip-text text-transparent">
                 RuangAman
               </span>
             </Link>
@@ -72,10 +73,11 @@ export default function Navigation() {
               <Link
                 key={link.path}
                 to={link.path}
+                aria-current={isActive(link.path) ? "page" : undefined}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                   isActive(link.path)
-                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
-                    : "text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600"
+                    ? "bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-lg"
+                    : "text-slate-700 hover:bg-gradient-to-r hover:from-sky-50 hover:to-blue-50 hover:text-sky-600"
                 }`}
               >
                 {link.label}
@@ -86,7 +88,9 @@ export default function Navigation() {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-gray-700 hover:text-blue-600 p-2 rounded-lg hover:bg-blue-50 transition-all"
+              aria-label={mobileMenuOpen ? "Tutup menu" : "Buka menu"}
+              aria-expanded={mobileMenuOpen}
+              className="text-slate-700 hover:text-sky-600 p-2 rounded-lg hover:bg-sky-50 transition-all"
             >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -105,10 +109,11 @@ export default function Navigation() {
               key={link.path}
               to={link.path}
               onClick={() => setMobileMenuOpen(false)}
+              aria-current={isActive(link.path) ? "page" : undefined}
               className={`block px-4 py-3 rounded-xl text-base font-medium transition-all ${
                 isActive(link.path)
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg '
-                  : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600'
+                  ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-lg '
+                  : 'text-slate-700 hover:bg-gradient-to-r hover:from-sky-50 hover:to-blue-50 hover:text-sky-600'
               }`}
             >
               {link.label}
