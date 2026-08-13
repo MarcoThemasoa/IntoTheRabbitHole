@@ -1,11 +1,5 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-// Impor DatePicker dan fungsi untuk registrasi lokal
-import DatePicker, { registerLocale } from "react-datepicker";
-// Impor data lokal Indonesia
-import { id } from "date-fns/locale/id";
-// Impor CSS untuk react-datepicker
-import "react-datepicker/dist/react-datepicker.css";
 import { MessageSquare, Calendar, User, ChevronDown, ChevronUp, Heart, ArrowRight, Users, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import Footer from "../components/Footer";
@@ -13,62 +7,99 @@ import { Button } from "@/components/ui/button";
 import type { ListStoriesResponse, Story } from "@/lib/types";
 import { getVisitorId } from "@/lib/utils";
 
-// Registrasi lokal 'id' untuk kalender
-registerLocale("id", id);
-
 // Jumlah cerita per halaman
 const STORIES_PER_PAGE = 6;
 
-// --- KOMPONEN FILTER ---
+// Nama bulan dalam Bahasa Indonesia
+const MONTH_OPTIONS = [
+  { value: "", label: "Semua Bulan" },
+  { value: "1", label: "Januari" },
+  { value: "2", label: "Februari" },
+  { value: "3", label: "Maret" },
+  { value: "4", label: "April" },
+  { value: "5", label: "Mei" },
+  { value: "6", label: "Juni" },
+  { value: "7", label: "Juli" },
+  { value: "8", label: "Agustus" },
+  { value: "9", label: "September" },
+  { value: "10", label: "Oktober" },
+  { value: "11", label: "November" },
+  { value: "12", label: "Desember" },
+];
+
+// --- KOMPONEN FILTER (UI custom, font mengikuti tema situs) ---
 function StoryFilters({
-  availableFilters,
-  startDate,
-  handleDateChange,
-} : {
-  availableFilters: { months: string[], years: string[] };
-  startDate: Date | null;
-  handleDateChange: (date: Date | null) => void;
-}) 
-{
+  selectedMonth,
+  selectedYear,
+  yearOptions,
+  onMonthChange,
+  onYearChange,
+  onClear,
+}: {
+  selectedMonth: string;
+  selectedYear: string;
+  yearOptions: string[];
+  onMonthChange: (month: string) => void;
+  onYearChange: (year: string) => void;
+  onClear: () => void;
+}) {
+  const selectClass =
+    "w-full px-3 py-2.5 text-sm text-slate-700 bg-white border border-slate-300 rounded-xl shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none transition-all cursor-pointer";
+
   return (
-    // Kotak filter
     <div className="bg-white p-6 rounded-2xl shadow-lg border border-sky-100 w-full sm:w-auto mt-6 md:mt-0">
-      <div className="flex flex-col gap-3" style={{ minWidth: "250px" }}>
-        {/* 1. Label + Input Kalender */}
+      <div className="flex flex-col gap-4" style={{ minWidth: "250px" }}>
         <div>
-          <label htmlFor="monthyear-filter" className="block text-sm font-medium text-slate-700 mb-2">
-            Filter Cerita (Bulan & Tahun)
-          </label>
-          
-          <div className="relative datepicker-wrapper">
-            <DatePicker
-              id="monthyear-filter"
-              locale="id" // Gunakan lokal Indonesia
-              selected={startDate}
-              onChange={handleDateChange}
-              showMonthYearPicker // Ini kunci untuk mode "month picker"
-              dateFormat="MMMM yyyy" // Format tampilan (cth: November 2025)
-              minDate={availableFilters.years.length ? new Date(parseInt(availableFilters.years[availableFilters.years.length - 1]), 0) : undefined}
-              maxDate={availableFilters.years.length ? new Date(parseInt(availableFilters.years[0]), 11) : undefined}
-              className="w-full px-3 py-1.5 text-slate-700 border border-slate-300 rounded-lg shadow-sm"
-              placeholderText="Pilih bulan..."
-              showIcon
-              toggleCalendarOnIconClick
-              wrapperClassName="w-full"
-            />
+          <p className="text-sm font-semibold text-slate-900 mb-1">Filter Cerita</p>
+          <p className="text-xs text-slate-500">Saring berdasarkan bulan &amp; tahun</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label htmlFor="month-filter" className="block text-xs font-medium text-slate-500 mb-1.5">
+              Bulan
+            </label>
+            <select
+              id="month-filter"
+              value={selectedMonth}
+              onChange={(e) => onMonthChange(e.target.value)}
+              className={selectClass}
+            >
+              {MONTH_OPTIONS.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="year-filter" className="block text-xs font-medium text-slate-500 mb-1.5">
+              Tahun
+            </label>
+            <select
+              id="year-filter"
+              value={selectedYear}
+              onChange={(e) => onYearChange(e.target.value)}
+              className={selectClass}
+            >
+              <option value="">Semua Tahun</option>
+              {yearOptions.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
-        
-        {/* 2. Tombol Hapus Filter */}
-        <div>
-          <button
-            type="button"
-            onClick={() => handleDateChange(null)} // Panggil handler dengan null
-            className="w-full px-3 py-1.5 text-sm rounded-full bg-white border border-slate-200 text-slate-700 hover:bg-sky-50"
-          >
-            Hapus filter
-          </button>
-        </div>
+
+        <button
+          type="button"
+          onClick={onClear}
+          className="w-full px-3 py-2 text-sm rounded-full bg-white border border-slate-200 text-slate-700 hover:bg-sky-50 hover:border-sky-200 transition-all"
+        >
+          Hapus filter
+        </button>
       </div>
     </div>
   );
@@ -92,35 +123,29 @@ export default function Stories() {
   const [isVisible, setIsVisible] = useState<{ [key: string]: boolean }>({});
   const [expandedStories, setExpandedStories] = useState<{ [key: string]: boolean }>({});
   
-  // State baru untuk filter dan paginasi
+  // State filter dan paginasi
   const [selectedMonth, setSelectedMonth] = useState(""); // "" = Semua
   const [selectedYear, setSelectedYear] = useState(""); // "" = Semua
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedMonthYear, setSelectedMonthYear] = useState(""); // format: YYYY-MM
   
-  // State untuk DatePicker, default null (kosong)
-  const [startDate, setStartDate] = useState<Date | null>(null);
   // Ref untuk menandai bagian atas section cerita
   const storiesSectionRef = useRef<HTMLElement>(null);
-  // --- HANDLER BARU UNTUK DATEPICKER ---
-  const handleDateChange = (date: Date | null) => {
-    setStartDate(date); // Set state untuk DatePicker
 
-    if (date) {
-      // Jika tanggal dipilih, set filter
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1); // JS month is 0-11
-      
-      setSelectedMonthYear(`${year}-${String(month).padStart(2, "0")}`);
-      setSelectedYear(year.toString());
-      setSelectedMonth(month); // Filter logic uses "8" not "08"
-    } else {
-      // Jika tanggal null (dihapus), bersihkan semua filter
-      setSelectedMonthYear("");
-      setSelectedYear("");
-      setSelectedMonth("");
-    }
-    setCurrentPage(1); // Selalu reset ke halaman 1
+  // --- HANDLER FILTER DROPDOWN ---
+  const handleMonthChange = (month: string) => {
+    setSelectedMonth(month);
+    setCurrentPage(1); // Reset ke halaman 1
+  };
+
+  const handleYearChange = (year: string) => {
+    setSelectedYear(year);
+    setCurrentPage(1); // Reset ke halaman 1
+  };
+
+  const clearFilters = () => {
+    setSelectedMonth("");
+    setSelectedYear("");
+    setCurrentPage(1);
   };
   
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -135,23 +160,26 @@ export default function Stories() {
   };
 
   // --- LOGIKA FILTER ---
-  const availableFilters = useMemo(() => {
-    if (!data?.stories) return { months: [], years: [] };
-    const months = new Set<string>();
-    const years = new Set<string>();
-    
-    data.stories.forEach(story => {
-      try {
-        const date = new Date(story.created_at);
-        months.add(String(date.getMonth() + 1));
-        years.add(String(date.getFullYear()));
-      } catch (e) { /* Abaikan tanggal invalid */ }
-    });
+  // Tahun yang ditampilkan: dari tahun data paling awal (minimal 2020) sampai tahun berjalan,
+  // sehingga tidak terbatas hanya pada tahun yang ada di data (mis. hanya 2025).
+  const yearOptions = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    let earliestYear = 2020;
 
-    return {
-      months: Array.from(months).sort((a, b) => parseInt(a) - parseInt(b)),
-      years: Array.from(years).sort((a, b) => parseInt(b) - parseInt(a)),
-    };
+    if (data?.stories) {
+      data.stories.forEach((story) => {
+        try {
+          const year = new Date(story.created_at).getFullYear();
+          if (year < earliestYear) earliestYear = year;
+        } catch (e) { /* Abaikan tanggal invalid */ }
+      });
+    }
+
+    const years: string[] = [];
+    for (let y = currentYear; y >= earliestYear; y--) {
+      years.push(String(y));
+    }
+    return years;
   }, [data]);
 
   const filteredStories = useMemo(() => {
@@ -249,11 +277,6 @@ export default function Stories() {
     }
   };
 
-  const getMonthName = (monthNumber: string) => {
-    const date = new Date(2000, parseInt(monthNumber) - 1, 1);
-    return new Intl.DateTimeFormat("id-ID", { month: "long" }).format(date);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-blue-50">
       {/* --- HEADER SECTION --- */}
@@ -278,9 +301,12 @@ export default function Stories() {
             {data?.stories && data.stories.length > 0 && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 ">
                 <StoryFilters 
-                  availableFilters={availableFilters}
-                  startDate={startDate}
-                  handleDateChange={handleDateChange}
+                  selectedMonth={selectedMonth}
+                  selectedYear={selectedYear}
+                  yearOptions={yearOptions}
+                  onMonthChange={handleMonthChange}
+                  onYearChange={handleYearChange}
+                  onClear={clearFilters}
                 />
               </div>
             )}
